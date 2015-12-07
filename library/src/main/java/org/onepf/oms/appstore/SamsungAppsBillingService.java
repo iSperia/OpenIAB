@@ -24,8 +24,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.onepf.oms.AppstoreInAppBillingService;
@@ -239,7 +239,7 @@ public class SamsungAppsBillingService implements AppstoreInAppBillingService {
     }
 
     @Override
-    public void launchPurchaseFlow(@NotNull Activity activity, @NotNull String sku, String itemType, int requestCode, OnIabPurchaseFinishedListener listener, String extraData) {
+    public void launchPurchaseFlow(@NonNull Activity activity, @NonNull String sku, String itemType, int requestCode, OnIabPurchaseFinishedListener listener, String extraData) {
         String itemGroupId = getItemGroupId(sku);
         String itemId = getItemId(sku);
 
@@ -351,13 +351,13 @@ public class SamsungAppsBillingService implements AppstoreInAppBillingService {
         mIapConnector = null;
     }
 
-    private String getItemGroupId(@NotNull String sku) {
+    private String getItemGroupId(@NonNull String sku) {
         SamsungApps.checkSku(sku);
         String[] skuParts = sku.split("/");
         return skuParts[0];
     }
 
-    private String getItemId(@NotNull String sku) {
+    private String getItemId(@NonNull String sku) {
         SamsungApps.checkSku(sku);
         String[] skuParts = sku.split("/");
         return skuParts[1];
@@ -416,7 +416,7 @@ public class SamsungAppsBillingService implements AppstoreInAppBillingService {
         setupListener.onIabSetupFinished(new IabResult(errorCode, errorMsg));
     }
 
-    private boolean processItemsBundle(@Nullable Bundle itemsBundle, String itemGroupId, @NotNull Inventory inventory, boolean querySkuDetails, boolean addPurchase, boolean addConsumable, @Nullable Set<String> queryItemIds) {
+    private boolean processItemsBundle(@Nullable Bundle itemsBundle, String itemGroupId, @NonNull Inventory inventory, boolean querySkuDetails, boolean addPurchase, boolean addConsumable, @Nullable Set<String> queryItemIds) {
         if (itemsBundle == null || itemsBundle.getInt(KEY_NAME_STATUS_CODE) != IAP_ERROR_NONE) {
             return false;
         }

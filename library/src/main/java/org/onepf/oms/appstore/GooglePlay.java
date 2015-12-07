@@ -22,8 +22,8 @@ import java.util.concurrent.TimeUnit;
 
 import android.content.pm.ResolveInfo;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import org.onepf.oms.Appstore;
 import org.onepf.oms.AppstoreInAppBillingService;
 import org.onepf.oms.DefaultAppstore;
@@ -162,7 +162,7 @@ public class GooglePlay extends DefaultAppstore {
         return OpenIabHelper.NAME_GOOGLE;
     }
 
-    private boolean packageExists(@NotNull Context context, String packageName) {
+    private boolean packageExists(@NonNull Context context, String packageName) {
         try {
             context.getPackageManager().getPackageInfo(packageName, 0);
             return true;

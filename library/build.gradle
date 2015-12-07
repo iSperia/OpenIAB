@@ -35,20 +35,20 @@ android {
 }
 
 //robolectric {
-    // configure the set of classes for JUnit tests
-    //include '**/*Test.class'
-    //exclude '**/espresso/**/*.class'
+// configure the set of classes for JUnit tests
+//include '**/*Test.class'
+//exclude '**/espresso/**/*.class'
 
-    // configure max heap size of the test JVM
-    //maxHeapSize = '2048m'
+// configure max heap size of the test JVM
+//maxHeapSize = '2048m'
 
-    // configure whether failing tests should fail the build
-    //ignoreFailures true
+// configure whether failing tests should fail the build
+//ignoreFailures true
 //}
 
 dependencies {
     compile fileTree(dir: 'libs', include: '*.jar')
-    compile 'com.intellij:annotations:12.0'
+    compile 'com.android.support:support-annotations:22.2.0'
     provided 'com.amazon:in-app-purchasing:2.0.61'
     provided 'com.braintree:fortumo-in-app:9.1.2'
 

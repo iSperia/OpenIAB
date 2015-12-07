@@ -33,8 +33,8 @@ import com.amazon.device.iap.model.RequestId;
 import com.amazon.device.iap.model.UserData;
 import com.amazon.device.iap.model.UserDataResponse;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.onepf.oms.AppstoreInAppBillingService;
@@ -120,7 +120,7 @@ public class AmazonAppstoreBillingService implements AppstoreInAppBillingService
     private IabHelper.OnIabSetupFinishedListener setupListener;
 
 
-    public AmazonAppstoreBillingService(@NotNull Context context) {
+    public AmazonAppstoreBillingService(@NonNull Context context) {
         this.context = context.getApplicationContext();
     }
 
@@ -226,7 +226,7 @@ public class AmazonAppstoreBillingService implements AppstoreInAppBillingService
                     break;
                 }
                 for (final Receipt receipt : purchaseUpdatesResponse.getReceipts()) {
-                    inventory.addPurchase(getPurchase(receipt));
+                    inventory.addPurchase(getPurchase(purchaseUpdatesResponse, receipt));
                 }
                 if (purchaseUpdatesResponse.hasMore()) {
                     PurchasingService.getPurchaseUpdates(false);
@@ -243,8 +243,8 @@ public class AmazonAppstoreBillingService implements AppstoreInAppBillingService
         }
     }
 
-    @NotNull
-    private Purchase getPurchase(@Nullable final Receipt receipt) {
+    @NonNull
+    private Purchase getPurchase(@Nullable PurchaseUpdatesResponse updateResponse, @Nullable final Receipt receipt) {
         final Purchase purchase = new Purchase(OpenIabHelper.NAME_AMAZON);
         if (receipt == null) {
             return purchase;
@@ -253,6 +253,12 @@ public class AmazonAppstoreBillingService implements AppstoreInAppBillingService
         final String storeSku = receipt.getSku();
         purchase.setSku(SkuManager.getInstance().getSku(OpenIabHelper.NAME_AMAZON, storeSku));
         purchase.setToken(receipt.getReceiptId());
+        purchase.setPurchaseTime(receipt.getPurchaseDate().getTime());
+
+        if (updateResponse != null) {
+            purchase.setOriginalJson(generateOriginalJson(updateResponse, receipt));
+            purchase.setPurchaseState(0);
+        }
 
         switch (receipt.getProductType()) {
             case CONSUMABLE:
@@ -272,7 +278,7 @@ public class AmazonAppstoreBillingService implements AppstoreInAppBillingService
     }
 
     @Override
-    public void onProductDataResponse(@NotNull final ProductDataResponse productDataResponse) {
+    public void onProductDataResponse(@NonNull final ProductDataResponse productDataResponse) {
         final ProductDataResponse.RequestStatus status = productDataResponse.getRequestStatus();
         final RequestId requestId = productDataResponse.getRequestId();
         Logger.d("onItemDataResponse() reqStatus: ", status,
@@ -297,8 +303,8 @@ public class AmazonAppstoreBillingService implements AppstoreInAppBillingService
         }
     }
 
-    @NotNull
-    private SkuDetails getSkuDetails(@NotNull final Product product) {
+    @NonNull
+    private SkuDetails getSkuDetails(@NonNull final Product product) {
         final String sku = product.getSku();
         final String price = product.getPrice().toString();
         final String title = product.getTitle();
@@ -335,7 +341,7 @@ public class AmazonAppstoreBillingService implements AppstoreInAppBillingService
     }
 
     @Override
-    public void onPurchaseResponse(@NotNull final PurchaseResponse purchaseResponse) {
+    public void onPurchaseResponse(@NonNull final PurchaseResponse purchaseResponse) {
         final PurchaseResponse.RequestStatus status = purchaseResponse.getRequestStatus();
         final RequestId requestId = purchaseResponse.getRequestId();
         Logger.d("onPurchaseResponse() PurchaseRequestStatus:", status,
@@ -343,7 +349,7 @@ public class AmazonAppstoreBillingService implements AppstoreInAppBillingService
 
         final String requestSku = requestSkuMap.remove(requestId);
         final Receipt receipt = purchaseResponse.getReceipt();
-        final Purchase purchase = getPurchase(receipt);
+        final Purchase purchase = getPurchase(null, receipt);
         final IabResult result;
         switch (status) {
             case SUCCESSFUL:
@@ -414,7 +420,7 @@ public class AmazonAppstoreBillingService implements AppstoreInAppBillingService
      * @param purchaseResponse Purchase to convert.
      * @return Generate JSON from purchase.
      */
-    private String generateOriginalJson(@NotNull PurchaseResponse purchaseResponse) {
+    private String generateOriginalJson(@NonNull PurchaseResponse purchaseResponse) {
         final JSONObject json = new JSONObject();
         try {
             Receipt receipt = purchaseResponse.getReceipt();
@@ -424,6 +430,31 @@ public class AmazonAppstoreBillingService implements AppstoreInAppBillingService
             if (requestStatus != null) {
                 json.put(JSON_KEY_PURCHASE_STATUS, requestStatus.name());
             }
+            final UserData userData = purchaseResponse.getUserData();
+            if (userData != null) {
+                json.put(JSON_KEY_USER_ID, userData.getUserId());
+            }
+            final ProductType productType = receipt.getProductType();
+            if (productType != null) {
+                json.put(JSON_KEY_RECEIPT_ITEM_TYPE, productType.name());
+            }
+            json.put(JSON_KEY_RECEIPT_PURCHASE_TOKEN, receipt.getReceiptId());
+            Logger.d("generateOriginalJson(): JSON\n", json);
+        } catch (JSONException e) {
+            Logger.e("generateOriginalJson() failed to generate JSON", e);
+        }
+        return json.toString();
+    }
+
+    private String generateOriginalJson(@NonNull PurchaseUpdatesResponse purchaseResponse, @NonNull Receipt receipt) {
+        final JSONObject json = new JSONObject();
+        try {
+            json.put(JSON_KEY_ORDER_ID, purchaseResponse.getRequestId());
+            json.put(JSON_KEY_PRODUCT_ID, receipt.getSku());
+//            final PurchaseResponse.RequestStatus requestStatus = purchaseResponse.getRequestStatus();
+//            if (requestStatus != null) {
+//                json.put(JSON_KEY_PURCHASE_STATUS, receipt.get);
+//            }
             final UserData userData = purchaseResponse.getUserData();
             if (userData != null) {
                 json.put(JSON_KEY_USER_ID, userData.getUserId());

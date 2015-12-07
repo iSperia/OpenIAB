@@ -19,7 +19,7 @@ package org.onepf.oms;
 import android.app.Activity;
 import android.content.Intent;
 
-import org.jetbrains.annotations.Nullable;
+import android.support.annotation.Nullable;
 import org.onepf.oms.appstore.googleUtils.IabException;
 import org.onepf.oms.appstore.googleUtils.IabHelper;
 import org.onepf.oms.appstore.googleUtils.Inventory;

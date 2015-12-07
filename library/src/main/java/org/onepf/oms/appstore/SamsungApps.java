@@ -18,7 +18,7 @@ package org.onepf.oms.appstore;
 
 import android.app.Activity;
 
-import org.jetbrains.annotations.NotNull;
+import android.support.annotation.NonNull;
 import org.onepf.oms.Appstore;
 import org.onepf.oms.AppstoreInAppBillingService;
 import org.onepf.oms.DefaultAppstore;
@@ -75,7 +75,7 @@ public class SamsungApps extends DefaultAppstore {
     private OpenIabHelper.Options options;
 
     // isSamsungTestMode = true -> always returns Samsung Apps is installer and billing is available
-    public static boolean isSamsungTestMode;
+    public static boolean isSamsungTestMode = false;
 
     private Boolean isBillingAvailable;
 
@@ -128,7 +128,7 @@ public class SamsungApps extends DefaultAppstore {
         isBillingAvailable = false;
         final CountDownLatch mainLatch = new CountDownLatch(1);
         getInAppBillingService().startSetup(new IabHelper.OnIabSetupFinishedListener() {
-            public void onIabSetupFinished(@NotNull final IabResult result) {
+            public void onIabSetupFinished(@NonNull final IabResult result) {
                 if (result.isSuccess()) {
                     new Thread(new Runnable() {
                         public void run() {
@@ -181,7 +181,7 @@ public class SamsungApps extends DefaultAppstore {
         return OpenIabHelper.NAME_SAMSUNG;
     }
 
-    public static void checkSku(@NotNull String sku) {
+    public static void checkSku(@NonNull String sku) {
         String[] skuParts = sku.split("/");
         if (skuParts.length != 2) {
             throw new SamsungSkuFormatException("Samsung SKU must contain ITEM_GROUP_ID and ITEM_ID.");
