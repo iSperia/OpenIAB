@@ -271,7 +271,6 @@ public class OpenIabHelper {
                         final String className = serviceInfo.serviceInfo.name;
                         final ComponentName component = new ComponentName(packageName, className);
                         final Intent explicitIntent = new Intent(service);
-                        Log.e("Sergey", "BINDING service: " + explicitIntent.getAction() + " (" + explicitIntent.getPackage() + ")");
                         explicitIntent.setComponent(component);
                         return super.bindService(explicitIntent, conn, flags);
                     }
