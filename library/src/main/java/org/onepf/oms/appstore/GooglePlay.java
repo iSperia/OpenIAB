@@ -103,8 +103,8 @@ public class GooglePlay extends DefaultAppstore {
             return false;
         }
 
-        final Intent intent = new Intent(GooglePlay.VENDING_ACTION);
-        intent.setPackage(GooglePlay.ANDROID_INSTALLER);
+        final Intent intent = new Intent("com.android.vending.billing.InAppBillingService.BIND");
+        intent.setPackage("com.android.vending");
         final List<ResolveInfo> infoList = context.getPackageManager().queryIntentServices(intent, 0);
         if (CollectionUtils.isEmpty(infoList)) {
             Logger.e("isBillingAvailable() billing service is not available, even though Google Play application seems to be installed.");

@@ -32,6 +32,8 @@ import android.os.RemoteException;
 
 import com.android.vending.billing.IInAppBillingService;
 
+import java.util.List;
+
 /**
  * @author Boris Minaev, Oleg Orlov
  * @since 28.05.13
@@ -77,7 +79,7 @@ public class OpenAppstore extends DefaultAppstore {
                 }
 
                 @Override
-                public void dispose() {
+                public void dispose() throws IabAsyncInProgressException {
                     super.dispose();
                     try {
                         context.unbindService(serviceConn);
@@ -217,6 +219,16 @@ public class OpenAppstore extends DefaultAppstore {
         @Override
         public int consumePurchase(int apiVersion, String packageName, String purchaseToken) throws RemoteException {
             return openStoreBilling.consumePurchase(apiVersion, packageName, purchaseToken);
+        }
+
+        @Override
+        public int stub(int apiVersion, String packageName, String type) throws RemoteException {
+            return 0;
+        }
+
+        @Override
+        public Bundle getBuyIntentToReplaceSkus(int apiVersion, String packageName, List<String> oldSkus, String newSku, String type, String developerPayload) throws RemoteException {
+            return null;
         }
     }
 

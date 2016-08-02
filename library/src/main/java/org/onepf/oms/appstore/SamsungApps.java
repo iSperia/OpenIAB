@@ -142,13 +142,21 @@ public class SamsungApps extends DefaultAppstore {
                             } catch (IabException e) {
                                 Logger.e("isBillingAvailable() failed", e);
                             } finally {
-                                getInAppBillingService().dispose();
+                                try {
+                                    getInAppBillingService().dispose();
+                                } catch (IabHelper.IabAsyncInProgressException e) {
+                                    e.printStackTrace();
+                                }
                                 mainLatch.countDown();
                             }
                         }
                     }).start();
                 } else {
-                    getInAppBillingService().dispose();
+                    try {
+                        getInAppBillingService().dispose();
+                    } catch (IabHelper.IabAsyncInProgressException e) {
+                        e.printStackTrace();
+                    }
                     mainLatch.countDown();
                 }
             }

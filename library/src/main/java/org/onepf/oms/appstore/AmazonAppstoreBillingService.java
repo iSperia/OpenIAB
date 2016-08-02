@@ -451,10 +451,10 @@ public class AmazonAppstoreBillingService implements AppstoreInAppBillingService
         try {
             json.put(JSON_KEY_ORDER_ID, purchaseResponse.getRequestId());
             json.put(JSON_KEY_PRODUCT_ID, receipt.getSku());
-//            final PurchaseResponse.RequestStatus requestStatus = purchaseResponse.getRequestStatus();
-//            if (requestStatus != null) {
-//                json.put(JSON_KEY_PURCHASE_STATUS, receipt.get);
-//            }
+            final PurchaseUpdatesResponse.RequestStatus requestStatus = purchaseResponse.getRequestStatus();
+            if (requestStatus != null) {
+                json.put(JSON_KEY_PURCHASE_STATUS, requestStatus.toString());
+            }
             final UserData userData = purchaseResponse.getUserData();
             if (userData != null) {
                 json.put(JSON_KEY_USER_ID, userData.getUserId());

@@ -34,6 +34,8 @@ import android.text.TextUtils;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
+
 import org.onepf.oms.appstore.AmazonAppstore;
 import org.onepf.oms.appstore.GooglePlay;
 import org.onepf.oms.appstore.NokiaStore;
@@ -269,6 +271,7 @@ public class OpenIabHelper {
                         final String className = serviceInfo.serviceInfo.name;
                         final ComponentName component = new ComponentName(packageName, className);
                         final Intent explicitIntent = new Intent(service);
+                        Log.e("Sergey", "BINDING service: " + explicitIntent.getAction() + " (" + explicitIntent.getPackage() + ")");
                         explicitIntent.setComponent(component);
                         return super.bindService(explicitIntent, conn, flags);
                     }
@@ -502,7 +505,11 @@ public class OpenIabHelper {
                         } else {
                             final AppstoreInAppBillingService billingService;
                             if ((billingService = appstore.getInAppBillingService()) != null) {
-                                billingService.dispose();
+                                try {
+                                    billingService.dispose();
+                                } catch (IabHelper.IabAsyncInProgressException e) {
+                                    e.printStackTrace();
+                                }
                                 Logger.d("startSetup() billing service disposed for ", appstore.getAppstoreName());
                             }
                         }
@@ -513,7 +520,11 @@ public class OpenIabHelper {
                             for (final Appstore appstore : instantiatedAppstores) {
                                 final AppstoreInAppBillingService billingService;
                                 if ((billingService = appstore.getInAppBillingService()) != null) {
-                                    billingService.dispose();
+                                    try {
+                                        billingService.dispose();
+                                    } catch (IabHelper.IabAsyncInProgressException e) {
+                                        e.printStackTrace();
+                                    }
                                     Logger.d("startSetup() billing service disposed for ", appstore.getAppstoreName());
                                 }
                             }
@@ -857,7 +868,11 @@ public class OpenIabHelper {
     private void dispose(@NonNull final Collection<Appstore> appstores) {
         for (final Appstore appstore : appstores) {
             final AppstoreInAppBillingService billingService = appstore.getInAppBillingService();
-            billingService.dispose();
+            try {
+                billingService.dispose();
+            } catch (IabHelper.IabAsyncInProgressException e) {
+                e.printStackTrace();
+            }
             Logger.d("dispose() was called for ", appstore.getAppstoreName());
         }
     }
@@ -1263,7 +1278,11 @@ public class OpenIabHelper {
     public void dispose() {
         Logger.d("Disposing.");
         if (appStoreBillingService != null) {
-            appStoreBillingService.dispose();
+            try {
+                appStoreBillingService.dispose();
+            } catch (IabHelper.IabAsyncInProgressException e) {
+                e.printStackTrace();
+            }
         }
         appstore = null;
         appStoreBillingService = null;
@@ -1301,12 +1320,16 @@ public class OpenIabHelper {
     public void launchPurchaseFlow(Activity act, @NonNull String sku, String itemType, int requestCode,
                                    IabHelper.OnIabPurchaseFinishedListener listener, String extraData) {
         checkSetupDone("launchPurchaseFlow");
-        appStoreBillingService.launchPurchaseFlow(act,
-                SkuManager.getInstance().getStoreSku(appstore.getAppstoreName(), sku),
-                itemType,
-                requestCode,
-                listener,
-                extraData);
+        try {
+            appStoreBillingService.launchPurchaseFlow(act,
+                    SkuManager.getInstance().getStoreSku(appstore.getAppstoreName(), sku),
+                    itemType,
+                    requestCode,
+                    listener,
+                    extraData);
+        } catch (IabHelper.IabAsyncInProgressException e) {
+            e.printStackTrace();
+        }
     }
 
     public boolean handleActivityResult(int requestCode, int resultCode, Intent data) {
